@@ -1,0 +1,25 @@
+name: CI Pipeline (Vulnerable)
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout del código
+      uses: actions/checkout@v4
+
+    - name: Configurar Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    # Fase de infección: Instalación estándar
+    - name: Instalar dependencias
+      run: npm install
+      env:
+        # Simulamos un token inyectado por el servidor CI
+        NPM_TOKEN: "token_secreto_github_actions_999"
