@@ -7,29 +7,10 @@ on:
 jobs:
   security-check:
     uses: CurrJere/TFG---Control-de-la-supply-chain/.github/workflows/secure-npm-pipeline.yml@main
+    with:
+      framework-repo: CurrJere/TFG---Control-de-la-supply-chain
+      framework-ref: main
     permissions:
       contents: read
       security-events: write
       actions: read
-
-      
-# jobs:
-#  build:
-#    runs-on: ubuntu-latest
-
-#    steps:
-#    - name: Checkout del código
-#      uses: actions/checkout@v4
-
-#    - name: Configurar Node.js
-#      uses: actions/setup-node@v4
-#      with:
-#        node-version: '20'
-#
-    # Fase de infección: Instalación estándar
- #   - name: Instalar dependencias
- #     run: npm install
-  #    env:
-   #     # Simulamos un token inyectado por el servidor CI
-    #    NPM_TOKEN: "token_secreto_github_actions_999"
-
