@@ -1,0 +1,27 @@
+name: "Demo OIDC vs token estatico"
+
+on:
+  push:
+    branches: [demo-oidc]
+
+jobs:
+  modelo-tradicional:
+    name: "Modelo tradicional (token estatico)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Sonda de exfiltracion
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}   # token persistente, como en el modelo clasico
+        run: node probe-token.js
+
+  modelo-oidc:
+    name: "Modelo OIDC / Trusted Publishing"
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write     # identidad efimera; NO hay token persistente en el entorno
+      contents: read
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Sonda de exfiltracion
+        run: node probe-token.js   # sin NODE_AUTH_TOKEN: no hay nada que robar
