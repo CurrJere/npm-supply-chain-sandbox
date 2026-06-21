@@ -13,7 +13,7 @@ jobs:
     uses: CurrJere/TFG---Control-de-la-supply-chain/.github/workflows/secure-npm-pipeline.yml@main
     with:
       framework-repo: CurrJere/TFG---Control-de-la-supply-chain
-      framework-ref: main
+      framework-ref: v1.0.0
       fail-on-findings: 'true'
     permissions:
       contents: read
