@@ -10,7 +10,7 @@ on:
 
 jobs:
   security-check:
-    uses: CurrJere/TFG---Control-de-la-supply-chain/.github/workflows/secure-npm-pipeline.yml@main
+    uses: CurrJere/TFG---Control-de-la-supply-chain/.github/workflows/secure-npm-pipeline.yml@v1.0.0
     with:
       framework-repo: CurrJere/TFG---Control-de-la-supply-chain
       framework-ref: v1.0.0
