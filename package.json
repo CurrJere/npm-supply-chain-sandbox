@@ -12,5 +12,5 @@
   "dependencies": {
   "dotenv": "latest",
   "express": "5.2.1"
-}
+  }
 }
