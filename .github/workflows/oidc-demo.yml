@@ -1,27 +1,36 @@
-name: "Demo OIDC vs token estatico"
+# Laboratorio de Identidad: OIDC vs Token Estático
+name: "Demo OIDC vs Token Estático"
 
 on:
   push:
-    branches: [demo-oidc]
+    branches: [ "demo-oidc" ]
 
 jobs:
   modelo-tradicional:
-    name: "Modelo tradicional (token estatico)"
+    name: "Modelo Tradicional (Vulnerable)"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - name: Sonda de exfiltracion
+      - name: Checkout del código
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        
+      - name: Sonda de exfiltración (Escenario Estático)
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}   # token persistente, como en el modelo clasico
+          # Inyección clásica: El secreto queda expuesto en el process.env 
+          # durante toda la ejecución del job, siendo un objetivo fácil.
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: node probe-token.js
 
   modelo-oidc:
-    name: "Modelo OIDC / Trusted Publishing"
+    name: "Modelo OIDC (Trusted Publishing)"
     runs-on: ubuntu-latest
     permissions:
-      id-token: write     # identidad efimera; NO hay token persistente en el entorno
+      id-token: write   # [CRÍTICO] Otorga identidad efímera al runner
       contents: read
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - name: Sonda de exfiltracion
-        run: node probe-token.js   # sin NODE_AUTH_TOKEN: no hay nada que robar
+      - name: Checkout del código
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        
+      - name: Sonda de exfiltración (Escenario OIDC)
+        # Al basarnos en short-lived tokens de GitHub hacia el proveedor,
+        # no existen variables de entorno estáticas que inyectar.
+        run: node probe-token.js
