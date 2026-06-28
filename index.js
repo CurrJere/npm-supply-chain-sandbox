@@ -1,22 +1,32 @@
-// index.js
 require('dotenv').config();
 const express = require('express');
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
+// La aplicación legítima carga las credenciales en el process.env al arrancar.
+// En el sandbox, estas son los "honeytokens" que el malware intentará leer.
 const dbPassword = process.env.DB_PASSWORD;
 const awsKey = process.env.AWS_ACCESS_KEY_ID;
+const npmToken = process.env.NPM_TOKEN;
 
-if (!dbPassword || !awsKey) {
-  console.warn("⚠️  [AVISO] Faltan credenciales en el entorno. La app podría no funcionar correctamente.");
+console.log("[INFO] Inicializando servicio de backend...");
+
+// Validación estándar de variables de entorno (Fail-fast)
+if (!dbPassword || !awsKey || !npmToken) {
+    console.warn("[WARN] Faltan variables de entorno críticas. Los servicios externos podrían fallar.");
 } else {
-  console.log("✅ Credenciales cargadas en memoria correctamente.");
+    console.log("[INFO] Configuración de entorno cargada correctamente en memoria.");
 }
 
-app.get('/', (req, res) => {
-  res.send('¡Servidor de prueba funcionando y seguro!');
+// Endpoint de health-check (estándar de la industria para monitorización)
+app.get('/health', (req, res) => {
+    res.status(200).json({
+        status: 'UP',
+        message: 'Aplicación de pruebas operativa',
+        timestamp: new Date().toISOString()
+    });
 });
 
 app.listen(port, () => {
-  console.log(`Aplicación de prueba escuchando en http://localhost:${port}`);
+    console.log(`[INFO] Servidor escuchando en el puerto ${port}`);
 });
